@@ -288,7 +288,7 @@ If, for whatever reason, you need to create a command or event manually, i.e. wi
 
 ```javascript
 const command = { /* ... */ },
-    event = { /* ... */ };
+      event = { /* ... */ };
 
 console.log(Command.isWellformed(command)); // => true
 console.log(Event.isWellformed(event));     // => true
