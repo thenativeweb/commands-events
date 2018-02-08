@@ -1,62 +1,102 @@
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var formats = require('formats'),
     uuid = require('uuidv4');
 
-var Command = function Command(options) {
-  if (!formats.isObject(options)) {
-    throw new Error('Options are missing.');
-  }
-  if (!formats.isObject(options.context)) {
-    throw new Error('Context is missing.');
-  }
-  if (!formats.isAlphanumeric(options.context.name, { minLength: 1 })) {
-    throw new Error('Context name is missing.');
-  }
-  if (!formats.isObject(options.aggregate)) {
-    throw new Error('Aggregate is missing.');
-  }
-  if (!formats.isAlphanumeric(options.aggregate.name, { minLength: 1 })) {
-    throw new Error('Aggregate name is missing.');
-  }
-  if (!formats.isUuid(options.aggregate.id)) {
-    throw new Error('Aggregate id is missing.');
-  }
-  if (!formats.isAlphanumeric(options.name, { minLength: 1 })) {
-    throw new Error('Command name is missing.');
-  }
-  if (options.data && !formats.isObject(options.data)) {
-    throw new Error('Data must be an object.');
-  }
-  if (options.custom && !formats.isObject(options.custom)) {
-    throw new Error('Custom must be an object.');
+var Command = function () {
+  function Command(_ref) {
+    var context = _ref.context,
+        aggregate = _ref.aggregate,
+        name = _ref.name,
+        _ref$data = _ref.data,
+        data = _ref$data === undefined ? {} : _ref$data,
+        _ref$custom = _ref.custom,
+        custom = _ref$custom === undefined ? {} : _ref$custom;
+
+    _classCallCheck(this, Command);
+
+    if (!formats.isObject(context)) {
+      throw new Error('Context is missing.');
+    }
+    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+      throw new Error('Context name is missing.');
+    }
+    if (!formats.isObject(aggregate)) {
+      throw new Error('Aggregate is missing.');
+    }
+    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+      throw new Error('Aggregate name is missing.');
+    }
+    if (!formats.isUuid(aggregate.id)) {
+      throw new Error('Aggregate id is missing.');
+    }
+    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+      throw new Error('Command name is missing.');
+    }
+    if (!formats.isObject(data)) {
+      throw new Error('Data must be an object.');
+    }
+    if (!formats.isObject(custom)) {
+      throw new Error('Custom must be an object.');
+    }
+
+    this.context = { name: context.name };
+    this.aggregate = { name: aggregate.name, id: aggregate.id };
+    this.name = name;
+    this.id = uuid();
+
+    this.data = data;
+    this.custom = custom;
+    this.user = null;
+    this.metadata = {
+      timestamp: Date.now(),
+      correlationId: this.id,
+      causationId: this.id
+    };
   }
 
-  this.context = { name: options.context.name };
-  this.aggregate = { name: options.aggregate.name, id: options.aggregate.id };
-  this.name = options.name;
-  this.id = uuid();
+  _createClass(Command, [{
+    key: 'addToken',
+    value: function addToken(token) {
+      if (!token) {
+        throw new Error('Token is missing.');
+      }
 
-  this.data = options.data || {};
-  this.custom = options.custom || {};
-  this.user = null;
-  this.metadata = {
-    timestamp: Date.now(),
-    correlationId: this.id,
-    causationId: this.id
-  };
-};
+      this.user = {
+        id: token.sub,
+        token: token
+      };
+    }
+  }]);
 
-Command.wrap = function (options) {
-  var command = new Command(options);
+  return Command;
+}();
 
-  command.id = options.id;
-  command.metadata.timestamp = options.metadata.timestamp;
-  command.metadata.correlationId = options.metadata.correlationId;
-  command.metadata.causationId = options.metadata.causationId;
+Command.wrap = function (_ref2) {
+  var context = _ref2.context,
+      aggregate = _ref2.aggregate,
+      name = _ref2.name,
+      id = _ref2.id,
+      metadata = _ref2.metadata,
+      user = _ref2.user,
+      _ref2$data = _ref2.data,
+      data = _ref2$data === undefined ? {} : _ref2$data,
+      _ref2$custom = _ref2.custom,
+      custom = _ref2$custom === undefined ? {} : _ref2$custom;
 
-  if (options.user && options.user.token) {
-    command.addToken(options.user.token);
+  var command = new Command({ context: context, aggregate: aggregate, name: name, data: data, custom: custom });
+
+  command.id = id;
+  command.metadata.timestamp = metadata.timestamp;
+  command.metadata.correlationId = metadata.correlationId;
+  command.metadata.causationId = metadata.causationId;
+
+  if (user && user.token) {
+    command.addToken(user.token);
   }
 
   if (!Command.isWellformed(command)) {
@@ -64,17 +104,6 @@ Command.wrap = function (options) {
   }
 
   return command;
-};
-
-Command.prototype.addToken = function (token) {
-  if (!token) {
-    throw new Error('Token is missing.');
-  }
-
-  this.user = {
-    id: token.sub,
-    token: token
-  };
 };
 
 Command.isWellformed = function (command) {

@@ -1,6 +1,6 @@
 {
   "name": "commands-events",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "commands-events provides commands and events for DDD-based applications.",
   "contributors": [
     {

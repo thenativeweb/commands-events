@@ -1,94 +1,136 @@
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var formats = require('formats'),
     uuid = require('uuidv4');
 
-/* eslint-disable max-statements */
-var Event = function Event(options) {
-  if (!formats.isObject(options)) {
-    throw new Error('Options are missing.');
-  }
-  if (!formats.isObject(options.context)) {
-    throw new Error('Context is missing.');
-  }
-  if (!formats.isAlphanumeric(options.context.name, { minLength: 1 })) {
-    throw new Error('Context name is missing.');
-  }
-  if (!formats.isObject(options.aggregate)) {
-    throw new Error('Aggregate is missing.');
-  }
-  if (!formats.isAlphanumeric(options.aggregate.name, { minLength: 1 })) {
-    throw new Error('Aggregate name is missing.');
-  }
-  if (!formats.isUuid(options.aggregate.id)) {
-    throw new Error('Aggregate id is missing.');
-  }
-  if (!formats.isAlphanumeric(options.name, { minLength: 1 })) {
-    throw new Error('Event name is missing.');
-  }
-  if (options.type && !formats.isString(options.type, { minLength: 1 })) {
-    throw new Error('Type must be a string.');
-  }
-  if (!formats.isObject(options.data, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
-    throw new Error('Data must be an object.');
-  }
-  if (!formats.isObject(options.custom, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
-    throw new Error('Custom must be an object.');
-  }
-  if (!formats.isObject(options.metadata)) {
-    throw new Error('Metadata are missing.');
-  }
-  if (!formats.isUuid(options.metadata.correlationId)) {
-    throw new Error('Correlation id is missing.');
-  }
-  if (!formats.isUuid(options.metadata.causationId)) {
-    throw new Error('Causation id is missing.');
-  }
-  if (options.metadata.isAuthorized) {
-    if (!formats.isObject(options.metadata.isAuthorized)) {
-      throw new Error('Authorization must be an object.');
+var Event = function () {
+  function Event(_ref) {
+    var context = _ref.context,
+        aggregate = _ref.aggregate,
+        name = _ref.name,
+        metadata = _ref.metadata,
+        _ref$type = _ref.type,
+        type = _ref$type === undefined ? 'domain' : _ref$type,
+        _ref$data = _ref.data,
+        data = _ref$data === undefined ? {} : _ref$data,
+        _ref$custom = _ref.custom,
+        custom = _ref$custom === undefined ? {} : _ref$custom;
+
+    _classCallCheck(this, Event);
+
+    if (!formats.isObject(context)) {
+      throw new Error('Context is missing.');
     }
-    if (!formats.isString(options.metadata.isAuthorized.owner, { minLength: 1 })) {
-      throw new Error('Owner is missing.');
+    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+      throw new Error('Context name is missing.');
     }
-    if (!formats.isBoolean(options.metadata.isAuthorized.forAuthenticated)) {
-      throw new Error('For authenticated is missing.');
+    if (!formats.isObject(aggregate)) {
+      throw new Error('Aggregate is missing.');
     }
-    if (!formats.isBoolean(options.metadata.isAuthorized.forPublic)) {
-      throw new Error('For public is missing.');
+    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+      throw new Error('Aggregate name is missing.');
+    }
+    if (!formats.isUuid(aggregate.id)) {
+      throw new Error('Aggregate id is missing.');
+    }
+    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+      throw new Error('Event name is missing.');
+    }
+    if (type && !formats.isString(type, { minLength: 1 })) {
+      throw new Error('Type must be a string.');
+    }
+    if (!formats.isObject(data, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
+      throw new Error('Data must be an object.');
+    }
+    if (!formats.isObject(custom, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
+      throw new Error('Custom must be an object.');
+    }
+    if (!formats.isObject(metadata)) {
+      throw new Error('Metadata are missing.');
+    }
+    if (!formats.isUuid(metadata.correlationId)) {
+      throw new Error('Correlation id is missing.');
+    }
+    if (!formats.isUuid(metadata.causationId)) {
+      throw new Error('Causation id is missing.');
+    }
+    if (metadata.isAuthorized) {
+      if (!formats.isObject(metadata.isAuthorized)) {
+        throw new Error('Authorization must be an object.');
+      }
+      if (!formats.isString(metadata.isAuthorized.owner, { minLength: 1 })) {
+        throw new Error('Owner is missing.');
+      }
+      if (!formats.isBoolean(metadata.isAuthorized.forAuthenticated)) {
+        throw new Error('For authenticated is missing.');
+      }
+      if (!formats.isBoolean(metadata.isAuthorized.forPublic)) {
+        throw new Error('For public is missing.');
+      }
+    }
+
+    this.context = { name: context.name };
+    this.aggregate = { name: aggregate.name, id: aggregate.id };
+    this.name = name;
+    this.id = uuid();
+    this.type = type;
+
+    this.data = data;
+    this.custom = custom;
+    this.user = null;
+    this.metadata = {
+      timestamp: new Date().getTime(),
+      published: false,
+      correlationId: metadata.correlationId,
+      causationId: metadata.causationId
+    };
+
+    if (metadata.isAuthorized) {
+      this.metadata.isAuthorized = metadata.isAuthorized;
     }
   }
 
-  this.context = { name: options.context.name };
-  this.aggregate = { name: options.aggregate.name, id: options.aggregate.id };
-  this.name = options.name;
-  this.id = uuid();
-  this.type = options.type || 'domain';
+  _createClass(Event, [{
+    key: 'addUser',
+    value: function addUser(user) {
+      if (!user) {
+        throw new Error('User is missing.');
+      }
+      if (!user.id) {
+        throw new Error('User id is missing.');
+      }
 
-  this.data = options.data || {};
-  this.custom = options.custom || {};
-  this.user = null;
-  this.metadata = {
-    timestamp: new Date().getTime(),
-    published: false,
-    correlationId: options.metadata.correlationId,
-    causationId: options.metadata.causationId
-  };
+      this.user = {
+        id: user.id
+      };
+    }
+  }]);
 
-  if (options.metadata.isAuthorized) {
-    this.metadata.isAuthorized = options.metadata.isAuthorized;
-  }
-};
-/* eslint-enable max-statements */
+  return Event;
+}();
 
-Event.wrap = function (options) {
-  var event = new Event(options);
+Event.wrap = function (_ref2) {
+  var context = _ref2.context,
+      aggregate = _ref2.aggregate,
+      name = _ref2.name,
+      id = _ref2.id,
+      user = _ref2.user,
+      metadata = _ref2.metadata,
+      type = _ref2.type,
+      data = _ref2.data,
+      custom = _ref2.custom;
 
-  event.id = options.id;
-  event.metadata = options.metadata;
+  var event = new Event({ context: context, aggregate: aggregate, name: name, metadata: metadata, type: type, data: data, custom: custom });
 
-  if (options.user && options.user.id) {
-    event.addUser(options.user);
+  event.id = id;
+  event.metadata = metadata;
+
+  if (user && user.id) {
+    event.addUser(user);
   }
 
   if (!Event.isWellformed(event)) {
@@ -96,19 +138,6 @@ Event.wrap = function (options) {
   }
 
   return event;
-};
-
-Event.prototype.addUser = function (user) {
-  if (!user) {
-    throw new Error('User is missing.');
-  }
-  if (!user.id) {
-    throw new Error('User id is missing.');
-  }
-
-  this.user = {
-    id: user.id
-  };
 };
 
 Event.isWellformed = function (event) {
