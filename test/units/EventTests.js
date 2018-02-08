@@ -7,13 +7,6 @@ const Event = require('../../lib/Event');
 
 suite('Event', () => {
   /* eslint-disable no-new */
-  test('throws an error when no options are given.', done => {
-    assert.that(() => {
-      new Event();
-    }).is.throwing('Options are missing.');
-    done();
-  });
-
   test('throws an error when no context is given.', done => {
     assert.that(() => {
       new Event({
@@ -623,10 +616,8 @@ suite('Event', () => {
       assert.that(actual.metadata.hash).is.equalTo(event.metadata.hash);
       assert.that(actual.metadata.hashPredecessor).is.equalTo(event.metadata.hashPredecessor);
       assert.that(actual.metadata.isAuthorized.owner).is.equalTo(event.metadata.isAuthorized.owner);
-      assert.that(actual.metadata.isAuthorized.forAuthenticated).is.equalTo(
-        event.metadata.isAuthorized.forAuthenticated);
-      assert.that(actual.metadata.isAuthorized.forPublic).is.equalTo(
-        event.metadata.isAuthorized.forPublic);
+      assert.that(actual.metadata.isAuthorized.forAuthenticated).is.equalTo(event.metadata.isAuthorized.forAuthenticated);
+      assert.that(actual.metadata.isAuthorized.forPublic).is.equalTo(event.metadata.isAuthorized.forPublic);
       done();
     });
 

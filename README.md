@@ -4,7 +4,7 @@ commands-events provides commands and events for DDD-based applications.
 
 ## Installation
 
-```bash
+```shell
 $ npm install commands-events
 ```
 
@@ -13,8 +13,7 @@ $ npm install commands-events
 First, you need to add a reference to the commands-events module. Since you will use its `Command` and `Event` constructor functions, it's most probably a good idea to reference them directly.
 
 ```javascript
-const Command = require('commands-events').Command,
-      Event = require('commands-events').Event;
+const { Command, Event } = require('commands-events');
 ```
 
 ## Using commands
@@ -306,13 +305,13 @@ All commands and events that arise from an originating command additionally have
 
 To build this module use [roboter](https://www.npmjs.com/package/roboter).
 
-```bash
+```shell
 $ bot
 ```
 
 ## License
 
-Copyright (c) 2014-2017 the native web.
+Copyright (c) 2014-2018 the native web.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

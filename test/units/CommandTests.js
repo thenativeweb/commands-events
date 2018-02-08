@@ -6,13 +6,6 @@ const Command = require('../../lib/Command');
 
 suite('Command', () => {
   /* eslint-disable no-new */
-  test('throws an error when no options are given.', done => {
-    assert.that(() => {
-      new Command();
-    }).is.throwing('Options are missing.');
-    done();
-  });
-
   test('throws an error when no context is given.', done => {
     assert.that(() => {
       new Command({
