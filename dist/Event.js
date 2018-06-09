@@ -1,8 +1,14 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var formats = require('formats'),
     uuid = require('uuidv4');
@@ -19,28 +25,55 @@ var Event = function () {
         data = _ref$data === undefined ? {} : _ref$data,
         _ref$custom = _ref.custom,
         custom = _ref$custom === undefined ? {} : _ref$custom;
+    (0, _classCallCheck3.default)(this, Event);
 
-    _classCallCheck(this, Event);
-
-    if (!formats.isObject(context)) {
+    if (!context) {
       throw new Error('Context is missing.');
     }
-    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+    if (!context.name) {
       throw new Error('Context name is missing.');
     }
-    if (!formats.isObject(aggregate)) {
+    if (!aggregate) {
       throw new Error('Aggregate is missing.');
     }
-    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+    if (!aggregate.name) {
       throw new Error('Aggregate name is missing.');
     }
-    if (!formats.isUuid(aggregate.id)) {
+    if (!aggregate.id) {
       throw new Error('Aggregate id is missing.');
     }
-    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+    if (!name) {
       throw new Error('Event name is missing.');
     }
-    if (type && !formats.isString(type, { minLength: 1 })) {
+    if (!metadata) {
+      throw new Error('Metadata are missing.');
+    }
+    if (!metadata.correlationId) {
+      throw new Error('Correlation id is missing.');
+    }
+    if (!metadata.causationId) {
+      throw new Error('Causation id is missing.');
+    }
+
+    if (!formats.isObject(context)) {
+      throw new Error('Context must be an object.');
+    }
+    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+      throw new Error('Context name must be an alphanumeric string.');
+    }
+    if (!formats.isObject(aggregate)) {
+      throw new Error('Aggregate must be an object.');
+    }
+    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+      throw new Error('Aggregate name must be an alphanumeric string.');
+    }
+    if (!formats.isUuid(aggregate.id)) {
+      throw new Error('Aggregate id must be a uuid.');
+    }
+    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+      throw new Error('Event name must be an alphanumeric string.');
+    }
+    if (!formats.isString(type, { minLength: 1 })) {
       throw new Error('Type must be a string.');
     }
     if (!formats.isObject(data, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
@@ -50,26 +83,37 @@ var Event = function () {
       throw new Error('Custom must be an object.');
     }
     if (!formats.isObject(metadata)) {
-      throw new Error('Metadata are missing.');
+      throw new Error('Metadata must be an object.');
     }
     if (!formats.isUuid(metadata.correlationId)) {
-      throw new Error('Correlation id is missing.');
+      throw new Error('Correlation id must be a uuid.');
     }
     if (!formats.isUuid(metadata.causationId)) {
-      throw new Error('Causation id is missing.');
+      throw new Error('Causation id must be a uuid.');
     }
     if (metadata.isAuthorized) {
       if (!formats.isObject(metadata.isAuthorized)) {
         throw new Error('Authorization must be an object.');
       }
-      if (!formats.isString(metadata.isAuthorized.owner, { minLength: 1 })) {
+
+      if (!metadata.isAuthorized.owner) {
         throw new Error('Owner is missing.');
       }
-      if (!formats.isBoolean(metadata.isAuthorized.forAuthenticated)) {
+      if (metadata.isAuthorized.forAuthenticated === undefined) {
         throw new Error('For authenticated is missing.');
       }
-      if (!formats.isBoolean(metadata.isAuthorized.forPublic)) {
+      if (metadata.isAuthorized.forPublic === undefined) {
         throw new Error('For public is missing.');
+      }
+
+      if (!formats.isString(metadata.isAuthorized.owner, { minLength: 1 })) {
+        throw new Error('Owner must be a string.');
+      }
+      if (!formats.isBoolean(metadata.isAuthorized.forAuthenticated)) {
+        throw new Error('For authenticated must be a boolean.');
+      }
+      if (!formats.isBoolean(metadata.isAuthorized.forPublic)) {
+        throw new Error('For public must be a boolean.');
       }
     }
 
@@ -94,7 +138,7 @@ var Event = function () {
     }
   }
 
-  _createClass(Event, [{
+  (0, _createClass3.default)(Event, [{
     key: 'addUser',
     value: function addUser(user) {
       if (!user) {
@@ -109,7 +153,6 @@ var Event = function () {
       };
     }
   }]);
-
   return Event;
 }();
 
