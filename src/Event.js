@@ -5,25 +5,53 @@ const formats = require('formats'),
 
 class Event {
   constructor ({ context, aggregate, name, metadata, type = 'domain', data = {}, custom = {}}) {
-    if (!formats.isObject(context)) {
+    if (!context) {
       throw new Error('Context is missing.');
     }
-    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+    if (!context.name) {
       throw new Error('Context name is missing.');
     }
-    if (!formats.isObject(aggregate)) {
+    if (!aggregate) {
       throw new Error('Aggregate is missing.');
     }
-    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+    if (!aggregate.name) {
       throw new Error('Aggregate name is missing.');
     }
-    if (!formats.isUuid(aggregate.id)) {
+    if (!aggregate.id) {
       throw new Error('Aggregate id is missing.');
     }
-    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+    if (!name) {
       throw new Error('Event name is missing.');
     }
-    if (type && !formats.isString(type, { minLength: 1 })) {
+    if (!metadata) {
+      throw new Error('Metadata are missing.');
+    }
+    if (!metadata.correlationId) {
+      throw new Error('Correlation id is missing.');
+    }
+    if (!metadata.causationId) {
+      throw new Error('Causation id is missing.');
+    }
+
+    if (!formats.isObject(context)) {
+      throw new Error('Context must be an object.');
+    }
+    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+      throw new Error('Context name must be an alphanumeric string.');
+    }
+    if (!formats.isObject(aggregate)) {
+      throw new Error('Aggregate must be an object.');
+    }
+    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+      throw new Error('Aggregate name must be an alphanumeric string.');
+    }
+    if (!formats.isUuid(aggregate.id)) {
+      throw new Error('Aggregate id must be a uuid.');
+    }
+    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+      throw new Error('Event name must be an alphanumeric string.');
+    }
+    if (!formats.isString(type, { minLength: 1 })) {
       throw new Error('Type must be a string.');
     }
     if (!formats.isObject(data, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
@@ -33,26 +61,37 @@ class Event {
       throw new Error('Custom must be an object.');
     }
     if (!formats.isObject(metadata)) {
-      throw new Error('Metadata are missing.');
+      throw new Error('Metadata must be an object.');
     }
     if (!formats.isUuid(metadata.correlationId)) {
-      throw new Error('Correlation id is missing.');
+      throw new Error('Correlation id must be a uuid.');
     }
     if (!formats.isUuid(metadata.causationId)) {
-      throw new Error('Causation id is missing.');
+      throw new Error('Causation id must be a uuid.');
     }
     if (metadata.isAuthorized) {
       if (!formats.isObject(metadata.isAuthorized)) {
         throw new Error('Authorization must be an object.');
       }
-      if (!formats.isString(metadata.isAuthorized.owner, { minLength: 1 })) {
+
+      if (!metadata.isAuthorized.owner) {
         throw new Error('Owner is missing.');
       }
-      if (!formats.isBoolean(metadata.isAuthorized.forAuthenticated)) {
+      if (metadata.isAuthorized.forAuthenticated === undefined) {
         throw new Error('For authenticated is missing.');
       }
-      if (!formats.isBoolean(metadata.isAuthorized.forPublic)) {
+      if (metadata.isAuthorized.forPublic === undefined) {
         throw new Error('For public is missing.');
+      }
+
+      if (!formats.isString(metadata.isAuthorized.owner, { minLength: 1 })) {
+        throw new Error('Owner must be a string.');
+      }
+      if (!formats.isBoolean(metadata.isAuthorized.forAuthenticated)) {
+        throw new Error('For authenticated must be a boolean.');
+      }
+      if (!formats.isBoolean(metadata.isAuthorized.forPublic)) {
+        throw new Error('For public must be a boolean.');
       }
     }
 

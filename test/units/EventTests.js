@@ -3,7 +3,7 @@
 const assert = require('assertthat'),
       uuid = require('uuidv4');
 
-const Event = require('../../lib/Event');
+const Event = require('../../src/Event');
 
 suite('Event', () => {
   /* eslint-disable no-new */

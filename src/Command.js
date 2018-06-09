@@ -5,23 +5,42 @@ const formats = require('formats'),
 
 class Command {
   constructor ({ context, aggregate, name, data = {}, custom = {}}) {
-    if (!formats.isObject(context)) {
+    if (!context) {
       throw new Error('Context is missing.');
     }
-    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+    if (!context.name) {
       throw new Error('Context name is missing.');
     }
-    if (!formats.isObject(aggregate)) {
+    if (!aggregate) {
       throw new Error('Aggregate is missing.');
     }
-    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+    if (!aggregate.name) {
       throw new Error('Aggregate name is missing.');
     }
-    if (!formats.isUuid(aggregate.id)) {
+    if (!aggregate.id) {
       throw new Error('Aggregate id is missing.');
     }
-    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+    if (!name) {
       throw new Error('Command name is missing.');
+    }
+
+    if (!formats.isObject(context)) {
+      throw new Error('Context must be an object.');
+    }
+    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+      throw new Error('Context name must be an alphanumeric string.');
+    }
+    if (!formats.isObject(aggregate)) {
+      throw new Error('Aggregate must be an object.');
+    }
+    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+      throw new Error('Aggregate name must be an alphanumeric string.');
+    }
+    if (!formats.isUuid(aggregate.id)) {
+      throw new Error('Aggregate id must be a uuid.');
+    }
+    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+      throw new Error('Command name must be an alphanumeric string.');
     }
     if (!formats.isObject(data)) {
       throw new Error('Data must be an object.');
@@ -48,6 +67,9 @@ class Command {
   addToken (token) {
     if (!token) {
       throw new Error('Token is missing.');
+    }
+    if (!token.sub) {
+      throw new Error('Sub claim is missing.');
     }
 
     this.user = {

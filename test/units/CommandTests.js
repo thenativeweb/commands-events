@@ -2,7 +2,7 @@
 
 const assert = require('assertthat');
 
-const Command = require('../../lib/Command');
+const Command = require('../../src/Command');
 
 suite('Command', () => {
   /* eslint-disable no-new */

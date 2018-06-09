@@ -306,7 +306,7 @@ All commands and events that arise from an originating command additionally have
 To build this module use [roboter](https://www.npmjs.com/package/roboter).
 
 ```shell
-$ bot
+$ npx roboter
 ```
 
 ## License
