@@ -15,7 +15,7 @@
   "main": "dist/index.js",
   "dependencies": {
     "formats": "1.0.0",
-    "uuidv4": "1.0.0"
+    "uuidv4": "1.0.1"
   },
   "devDependencies": {
     "assertthat": "1.0.0",
