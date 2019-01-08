@@ -1,56 +1,62 @@
 'use strict';
 
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
 var formats = require('formats'),
     uuid = require('uuidv4');
 
-var Event = function () {
+var Event =
+/*#__PURE__*/
+function () {
   function Event(_ref) {
     var context = _ref.context,
         aggregate = _ref.aggregate,
         name = _ref.name,
         metadata = _ref.metadata,
         _ref$type = _ref.type,
-        type = _ref$type === undefined ? 'domain' : _ref$type,
+        type = _ref$type === void 0 ? 'domain' : _ref$type,
         _ref$data = _ref.data,
-        data = _ref$data === undefined ? {} : _ref$data,
+        data = _ref$data === void 0 ? {} : _ref$data,
         _ref$custom = _ref.custom,
-        custom = _ref$custom === undefined ? {} : _ref$custom;
-    (0, _classCallCheck3.default)(this, Event);
+        custom = _ref$custom === void 0 ? {} : _ref$custom;
+    (0, _classCallCheck2.default)(this, Event);
 
     if (!context) {
       throw new Error('Context is missing.');
     }
+
     if (!context.name) {
       throw new Error('Context name is missing.');
     }
+
     if (!aggregate) {
       throw new Error('Aggregate is missing.');
     }
+
     if (!aggregate.name) {
       throw new Error('Aggregate name is missing.');
     }
+
     if (!aggregate.id) {
       throw new Error('Aggregate id is missing.');
     }
+
     if (!name) {
       throw new Error('Event name is missing.');
     }
+
     if (!metadata) {
       throw new Error('Metadata are missing.');
     }
+
     if (!metadata.correlationId) {
       throw new Error('Correlation id is missing.');
     }
+
     if (!metadata.causationId) {
       throw new Error('Causation id is missing.');
     }
@@ -58,39 +64,67 @@ var Event = function () {
     if (!formats.isObject(context)) {
       throw new Error('Context must be an object.');
     }
-    if (!formats.isAlphanumeric(context.name, { minLength: 1 })) {
+
+    if (!formats.isAlphanumeric(context.name, {
+      minLength: 1
+    })) {
       throw new Error('Context name must be an alphanumeric string.');
     }
+
     if (!formats.isObject(aggregate)) {
       throw new Error('Aggregate must be an object.');
     }
-    if (!formats.isAlphanumeric(aggregate.name, { minLength: 1 })) {
+
+    if (!formats.isAlphanumeric(aggregate.name, {
+      minLength: 1
+    })) {
       throw new Error('Aggregate name must be an alphanumeric string.');
     }
+
     if (!formats.isUuid(aggregate.id)) {
       throw new Error('Aggregate id must be a uuid.');
     }
-    if (!formats.isAlphanumeric(name, { minLength: 1 })) {
+
+    if (!formats.isAlphanumeric(name, {
+      minLength: 1
+    })) {
       throw new Error('Event name must be an alphanumeric string.');
     }
-    if (!formats.isString(type, { minLength: 1 })) {
+
+    if (!formats.isString(type, {
+      minLength: 1
+    })) {
       throw new Error('Type must be a string.');
     }
-    if (!formats.isObject(data, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
+
+    if (!formats.isObject(data, {
+      isOptional: true,
+      schema: {},
+      isSchemaRelaxed: true
+    })) {
       throw new Error('Data must be an object.');
     }
-    if (!formats.isObject(custom, { isOptional: true, schema: {}, isSchemaRelaxed: true })) {
+
+    if (!formats.isObject(custom, {
+      isOptional: true,
+      schema: {},
+      isSchemaRelaxed: true
+    })) {
       throw new Error('Custom must be an object.');
     }
+
     if (!formats.isObject(metadata)) {
       throw new Error('Metadata must be an object.');
     }
+
     if (!formats.isUuid(metadata.correlationId)) {
       throw new Error('Correlation id must be a uuid.');
     }
+
     if (!formats.isUuid(metadata.causationId)) {
       throw new Error('Causation id must be a uuid.');
     }
+
     if (metadata.isAuthorized) {
       if (!formats.isObject(metadata.isAuthorized)) {
         throw new Error('Authorization must be an object.');
@@ -99,30 +133,40 @@ var Event = function () {
       if (!metadata.isAuthorized.owner) {
         throw new Error('Owner is missing.');
       }
+
       if (metadata.isAuthorized.forAuthenticated === undefined) {
         throw new Error('For authenticated is missing.');
       }
+
       if (metadata.isAuthorized.forPublic === undefined) {
         throw new Error('For public is missing.');
       }
 
-      if (!formats.isString(metadata.isAuthorized.owner, { minLength: 1 })) {
+      if (!formats.isString(metadata.isAuthorized.owner, {
+        minLength: 1
+      })) {
         throw new Error('Owner must be a string.');
       }
+
       if (!formats.isBoolean(metadata.isAuthorized.forAuthenticated)) {
         throw new Error('For authenticated must be a boolean.');
       }
+
       if (!formats.isBoolean(metadata.isAuthorized.forPublic)) {
         throw new Error('For public must be a boolean.');
       }
     }
 
-    this.context = { name: context.name };
-    this.aggregate = { name: aggregate.name, id: aggregate.id };
+    this.context = {
+      name: context.name
+    };
+    this.aggregate = {
+      name: aggregate.name,
+      id: aggregate.id
+    };
     this.name = name;
     this.id = uuid();
     this.type = type;
-
     this.data = data;
     this.custom = custom;
     this.user = null;
@@ -138,12 +182,13 @@ var Event = function () {
     }
   }
 
-  (0, _createClass3.default)(Event, [{
-    key: 'addUser',
+  (0, _createClass2.default)(Event, [{
+    key: "addUser",
     value: function addUser(user) {
       if (!user) {
         throw new Error('User is missing.');
       }
+
       if (!user.id) {
         throw new Error('User id is missing.');
       }
@@ -166,9 +211,15 @@ Event.wrap = function (_ref2) {
       type = _ref2.type,
       data = _ref2.data,
       custom = _ref2.custom;
-
-  var event = new Event({ context: context, aggregate: aggregate, name: name, metadata: metadata, type: type, data: data, custom: custom });
-
+  var event = new Event({
+    context: context,
+    aggregate: aggregate,
+    name: name,
+    metadata: metadata,
+    type: type,
+    data: data,
+    custom: custom
+  });
   event.id = id;
   event.metadata = metadata;
 
@@ -188,18 +239,26 @@ Event.isWellformed = function (event) {
     schema: {
       context: formats.object({
         schema: {
-          name: formats.alphanumeric({ minLength: 1 })
+          name: formats.alphanumeric({
+            minLength: 1
+          })
         }
       }),
       aggregate: formats.object({
         schema: {
-          name: formats.alphanumeric({ minLength: 1 }),
+          name: formats.alphanumeric({
+            minLength: 1
+          }),
           id: formats.uuid()
         }
       }),
-      name: formats.alphanumeric({ minLength: 1 }),
+      name: formats.alphanumeric({
+        minLength: 1
+      }),
       id: formats.uuid(),
-      type: formats.string({ minLength: 1 }),
+      type: formats.string({
+        minLength: 1
+      }),
       data: formats.object({
         schema: {},
         isSchemaRelaxed: true
@@ -210,7 +269,9 @@ Event.isWellformed = function (event) {
       }),
       user: formats.object({
         schema: {
-          id: formats.string({ minLength: 1 })
+          id: formats.string({
+            minLength: 1
+          })
         },
         isOptional: true
       }),
@@ -224,7 +285,9 @@ Event.isWellformed = function (event) {
           isAuthorized: formats.object({
             isOptional: true,
             schema: {
-              owner: formats.string({ minLength: 1 }),
+              owner: formats.string({
+                minLength: 1
+              }),
               forAuthenticated: formats.boolean(),
               forPublic: formats.boolean()
             },
