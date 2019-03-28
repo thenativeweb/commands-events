@@ -2,7 +2,7 @@
 
 const assert = require('assertthat');
 
-const Command = require('../../src/Command');
+const Command = require('../../lib/Command');
 
 suite('Command', () => {
   /* eslint-disable no-new */
@@ -75,7 +75,7 @@ suite('Command', () => {
     done();
   });
 
-  test('throws an error when no command name is given.', done => {
+  test('throws an error when no name is given.', done => {
     assert.that(() => {
       new Command({
         context: {
@@ -86,7 +86,7 @@ suite('Command', () => {
           id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
         }
       });
-    }).is.throwing('Command name is missing.');
+    }).is.throwing('Name is missing.');
     done();
   });
 
@@ -103,7 +103,7 @@ suite('Command', () => {
         name: 'baz',
         data: 'foobarbaz'
       });
-    }).is.throwing('Data must be an object.');
+    }).is.throwing('Invalid type: string should be object (at command.data).');
     done();
   });
 
@@ -120,7 +120,7 @@ suite('Command', () => {
         name: 'baz',
         custom: 'foobarbaz'
       });
-    }).is.throwing('Custom must be an object.');
+    }).is.throwing('Invalid type: string should be object (at command.custom).');
     done();
   });
 
@@ -284,7 +284,7 @@ suite('Command', () => {
 
       assert.that(() => {
         Command.wrap(deserializedCommand);
-      }).is.throwing('Command is malformed.');
+      }).is.throwing('Invalid type: string should be number (at command.metadata.timestamp).');
       done();
     });
 

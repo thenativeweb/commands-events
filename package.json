@@ -12,15 +12,14 @@
       "email": "matthias.wagler@thenativeweb.io"
     }
   ],
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "dependencies": {
-    "@babel/runtime": "7.2.0",
-    "formats": "1.0.0",
-    "uuidv4": "2.0.0"
+    "uuidv4": "3.0.1",
+    "validate-value": "5.0.2"
   },
   "devDependencies": {
-    "assertthat": "2.0.1",
-    "roboter": "3.0.3"
+    "assertthat": "2.0.3",
+    "roboter": "4.0.3"
   },
   "repository": {
     "type": "git",

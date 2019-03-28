@@ -242,25 +242,6 @@ In any case, the result is an object with the following structure.
 }
 ```
 
-### Adding authorization metadata
-
-You might want to add authorization metadata to an event in order to specify clearly who is allowed to read this event. Use the `metadata.isAuthorized` property and make sure to set the `owner`, `forAuthenticated` and `forPublic` properties.
-
-```javascript
-const event = new Event({
-  // ...
-  metadata: {
-    correlationId: '13505cab-0ca2-4502-b8c9-8f3ce63ae390',
-    causationId: '124885f3-d35e-43a6-84eb-e28c70b5be66'
-    isAuthorized: {
-      owner: 'a7e2a714-17f0-45e4-9693-6e3a472cc3d9',
-      forAuthenticated: true,
-      forPublic: false
-    }
-  }
-});
-```
-
 ### Adding a user to an event
 
 To add a user to an event, e.g. to indicate which user caused it, call the `addUser` function and hand over the user. The user may be taken from a command, e.g. with `command.user`. It must contain an `id`.
@@ -311,7 +292,7 @@ $ npx roboter
 
 ## License
 
-Copyright (c) 2014-2018 the native web.
+Copyright (c) 2014-2019 the native web.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
