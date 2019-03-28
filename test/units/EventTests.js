@@ -262,7 +262,7 @@ suite('Event', () => {
     assert.that(actual.type).is.equalTo('domain');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
     assert.that(actual.custom).is.equalTo({});
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.published).is.false();
     assert.that(actual.metadata.correlationId).is.equalTo('5be0cef4-9051-44ca-a18c-a57c48d711c1');
@@ -301,7 +301,7 @@ suite('Event', () => {
     assert.that(actual.type).is.equalTo('domain');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
     assert.that(actual.custom).is.equalTo({ foo: 'custom-foobar' });
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.published).is.false();
     assert.that(actual.metadata.correlationId).is.equalTo('5be0cef4-9051-44ca-a18c-a57c48d711c1');
@@ -337,7 +337,7 @@ suite('Event', () => {
     assert.that(actual.id).is.ofType('string');
     assert.that(actual.type).is.equalTo('error');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.published).is.false();
     assert.that(actual.metadata.correlationId).is.equalTo('5be0cef4-9051-44ca-a18c-a57c48d711c1');
@@ -345,7 +345,7 @@ suite('Event', () => {
     done();
   });
 
-  suite('addUser', () => {
+  suite('addInitiator', () => {
     let event;
 
     setup(() => {
@@ -369,35 +369,35 @@ suite('Event', () => {
     });
 
     test('is a function.', done => {
-      assert.that(event.addUser).is.ofType('function');
+      assert.that(event.addInitiator).is.ofType('function');
       done();
     });
 
-    test('throws an error if user is missing.', done => {
+    test('throws an error if initiator is missing.', done => {
       assert.that(() => {
-        event.addUser();
-      }).is.throwing('User is missing.');
+        event.addInitiator();
+      }).is.throwing('Initiator is missing.');
       done();
     });
 
-    test('throws an error if user id is missing.', done => {
+    test('throws an error if initiator id is missing.', done => {
       assert.that(() => {
-        event.addUser({});
-      }).is.throwing('User id is missing.');
+        event.addInitiator({});
+      }).is.throwing('Initiator id is missing.');
       done();
     });
 
-    test('adds the user.', done => {
-      event.addUser({ id: 'Jane Doe' });
+    test('adds the initiator.', done => {
+      event.addInitiator({ id: 'Jane Doe' });
 
-      assert.that(event.user).is.equalTo({ id: 'Jane Doe' });
+      assert.that(event.initiator).is.equalTo({ id: 'Jane Doe' });
       done();
     });
   });
 
-  suite('wrap', () => {
+  suite('deserialize', () => {
     test('is a function.', done => {
-      assert.that(Event.wrap).is.ofType('function');
+      assert.that(Event.deserialize).is.ofType('function');
       done();
     });
 
@@ -422,7 +422,7 @@ suite('Event', () => {
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
       assert.that(actual).is.instanceOf(Event);
       done();
@@ -452,7 +452,7 @@ suite('Event', () => {
       deserializedEvent.metadata.timestamp = 'foo';
 
       assert.that(() => {
-        Event.wrap(deserializedEvent);
+        Event.deserialize(deserializedEvent);
       }).is.throwing('Invalid type: string should be number (at event.metadata.timestamp).');
       done();
     });
@@ -481,7 +481,7 @@ suite('Event', () => {
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
       assert.that(actual.id).is.equalTo(event.id);
       assert.that(actual.metadata.correlationId).is.equalTo(event.metadata.correlationId);
@@ -516,13 +516,13 @@ suite('Event', () => {
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
       assert.that(actual.custom).is.equalTo(event.custom);
       done();
     });
 
-    test('keeps user data.', done => {
+    test('keeps initiator data.', done => {
       const event = new Event({
         context: {
           name: 'foo'
@@ -541,15 +541,15 @@ suite('Event', () => {
         }
       });
 
-      event.addUser({
+      event.addInitiator({
         id: 'Jane Doe'
       });
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
-      assert.that(actual.user).is.equalTo(event.user);
+      assert.that(actual.initiator).is.equalTo(event.initiator);
       done();
     });
   });
@@ -981,7 +981,7 @@ suite('Event', () => {
           timestamp: Date.now(),
           published: true
         },
-        user: {
+        initiator: {
           id: '3815e5b5-3d79-4875-bac2-7a1c9f88048b'
         },
         custom: {

@@ -147,7 +147,7 @@ suite('Command', () => {
     assert.that(actual.id).is.ofType('string');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
     assert.that(actual.custom).is.equalTo({});
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.correlationId).is.equalTo(actual.id);
     assert.that(actual.metadata.causationId).is.equalTo(actual.id);
@@ -180,7 +180,7 @@ suite('Command', () => {
     assert.that(actual.id).is.ofType('string');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
     assert.that(actual.custom).is.equalTo({ foo: 'custom-foobar' });
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.correlationId).is.equalTo(actual.id);
     assert.that(actual.metadata.causationId).is.equalTo(actual.id);
@@ -188,7 +188,7 @@ suite('Command', () => {
   });
   /* eslint-enable no-new */
 
-  suite('addToken', () => {
+  suite('addInitiator', () => {
     let command;
 
     setup(() => {
@@ -208,35 +208,35 @@ suite('Command', () => {
     });
 
     test('is a function.', done => {
-      assert.that(command.addToken).is.ofType('function');
+      assert.that(command.addInitiator).is.ofType('function');
       done();
     });
 
     test('throws an error if token is missing.', done => {
       assert.that(() => {
-        command.addToken();
+        command.addInitiator({});
       }).is.throwing('Token is missing.');
       done();
     });
 
     test('adds the token.', done => {
-      command.addToken({ sub: 'Jane Doe' });
+      command.addInitiator({ token: { sub: 'Jane Doe' }});
 
-      assert.that(command.user.token).is.equalTo({ sub: 'Jane Doe' });
+      assert.that(command.initiator.token).is.equalTo({ sub: 'Jane Doe' });
       done();
     });
 
-    test('sets sub as the user id.', done => {
-      command.addToken({ sub: 'Jane Doe' });
+    test('sets sub as the initiator id.', done => {
+      command.addInitiator({ token: { sub: 'Jane Doe' }});
 
-      assert.that(command.user.id).is.equalTo('Jane Doe');
+      assert.that(command.initiator.id).is.equalTo('Jane Doe');
       done();
     });
   });
 
-  suite('wrap', () => {
+  suite('deserialize', () => {
     test('is a function.', done => {
-      assert.that(Command.wrap).is.ofType('function');
+      assert.that(Command.deserialize).is.ofType('function');
       done();
     });
 
@@ -257,7 +257,7 @@ suite('Command', () => {
 
       const deserializedCommand = JSON.parse(JSON.stringify(command));
 
-      const actual = Command.wrap(deserializedCommand);
+      const actual = Command.deserialize(deserializedCommand);
 
       assert.that(actual).is.instanceOf(Command);
       done();
@@ -283,7 +283,7 @@ suite('Command', () => {
       deserializedCommand.metadata.timestamp = 'foo';
 
       assert.that(() => {
-        Command.wrap(deserializedCommand);
+        Command.deserialize(deserializedCommand);
       }).is.throwing('Invalid type: string should be number (at command.metadata.timestamp).');
       done();
     });
@@ -305,7 +305,7 @@ suite('Command', () => {
 
       const deserializedCommand = JSON.parse(JSON.stringify(command));
 
-      const actual = Command.wrap(deserializedCommand);
+      const actual = Command.deserialize(deserializedCommand);
 
       assert.that(actual.id).is.equalTo(command.id);
       assert.that(actual.metadata.correlationId).is.equalTo(command.metadata.correlationId);
@@ -334,13 +334,13 @@ suite('Command', () => {
 
       const deserializedCommand = JSON.parse(JSON.stringify(command));
 
-      const actual = Command.wrap(deserializedCommand);
+      const actual = Command.deserialize(deserializedCommand);
 
       assert.that(actual.custom).is.equalTo(command.custom);
       done();
     });
 
-    test('keeps user data.', done => {
+    test('keeps initiator data.', done => {
       const command = new Command({
         context: {
           name: 'foo'
@@ -355,15 +355,13 @@ suite('Command', () => {
         }
       });
 
-      command.addToken({
-        sub: 'Jane Doe'
-      });
+      command.addInitiator({ token: { sub: 'Jane Doe' }});
 
       const deserializedCommand = JSON.parse(JSON.stringify(command));
 
-      const actual = Command.wrap(deserializedCommand);
+      const actual = Command.deserialize(deserializedCommand);
 
-      assert.that(actual.user).is.equalTo(command.user);
+      assert.that(actual.initiator).is.equalTo(command.initiator);
       done();
     });
   });
@@ -686,7 +684,7 @@ suite('Command', () => {
           foo: 'foobarbaz'
         },
         custom: {},
-        user: {
+        initiator: {
           id: '3815e5b5-3d79-4875-bac2-7a1c9f88048b',
           token: {
             sub: '3815e5b5-3d79-4875-bac2-7a1c9f88048b'

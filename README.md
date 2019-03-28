@@ -93,7 +93,7 @@ In any case, the result is an object with an additional `metadata` property.
   custom: {
     sourceIp: '127.0.0.1'
   },
-  user: null,
+  initiator: null,
   metadata: {
     timestamp: 1421260133331,
     correlationId: '4784bce1-4b7b-45a0-87e4-3058303194e6',
@@ -102,26 +102,26 @@ In any case, the result is an object with an additional `metadata` property.
 }
 ```
 
-### Adding a token to a command
+### Adding an initiator to a command
 
-To add a JWT token to a command, e.g. to indicate which user caused it, call the `addToken` function and hand over the token.
+To add an initiator to a command, call the `addInitiator` function and hand over a JWT token.
 
 ```javascript
 const token = getJwt();
 
-command.addToken(token);
+command.addInitiator({ token });
 ```
 
-Then you can access the user's id (which is identical to the `sub` claim) by using the `command.user.id` property. If you want to access the entire token use `command.user.token`.
+Then you can access the initiator's id (which is identical to the `sub` claim) by using the `command.initiator.id` property. If you want to access the entire token use `command.initiator.token`.
 
-Please note that until you provide a token, the command's `user` property will be `null`.
+Please note that until you provide an initiator, the command's `initiator` property will be `null`.
 
-### Handling deserialized commands
+### Handling serialized commands
 
-If you serialize and deserialize a command, all its data is kept, but its constructor and prototype are lost. To recreate them, use the `wrap` function.
+If you serialize and deserialize a command, all its data is kept, but its constructor and prototype are lost. To recreate them, use the `deserialize` function.
 
 ```javascript
-const command = Command.wrap(deserializedCommand);
+const command = Command.deserialize(serializedCommand);
 ```
 
 ## Using events
@@ -233,6 +233,7 @@ In any case, the result is an object with the following structure.
   data: {
     ttl: 10000
   },
+  initiator: null,
   metadata: {
     timestamp: 1421261012560,
     published: false,
@@ -242,24 +243,24 @@ In any case, the result is an object with the following structure.
 }
 ```
 
-### Adding a user to an event
+### Adding an initiator to an event
 
-To add a user to an event, e.g. to indicate which user caused it, call the `addUser` function and hand over the user. The user may be taken from a command, e.g. with `command.user`. It must contain an `id`.
+To add an initiator to an event, call the `addInitiator` function and hand over the initiator. The initiator may be taken from a command, e.g. with `command.initiator`. It must contain an `id`.
 
 ```javascript
-event.addUser(command.user);
+event.addInitiator(command.initiator);
 ```
 
-Then you can access the user's id by using the `event.user.id` property.
+Then you can access the initiator's id by using the `event.initiator.id` property.
 
-Please note that until you provide a user, the event's `user` property will be `null`.
+Please note that until you provide an initiator, the event's `initiator` property will be `null`.
 
-### Handling deserialized events
+### Handling serialized events
 
-If you serialize and deserialize an event, all its data is kept, but its constructor and prototype are lost. To recreate them, use the `wrap` function.
+If you serialize and deserialize an event, all its data is kept, but its constructor and prototype are lost. To recreate them, use the `deserialize` function.
 
 ```javascript
-const event = Event.wrap(deserializedEvent);
+const event = Event.deserialize(serializedEvent);
 ```
 
 ## Manually creating commands and events
