@@ -14,7 +14,7 @@
   ],
   "main": "lib/index.js",
   "dependencies": {
-    "uuidv4": "3.0.1",
+    "uuidv4": "4.0.0",
     "validate-value": "5.0.2"
   },
   "devDependencies": {
