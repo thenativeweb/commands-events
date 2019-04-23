@@ -1,9 +1,8 @@
 'use strict';
 
-const assert = require('assertthat'),
-      uuid = require('uuidv4');
+const assert = require('assertthat');
 
-const Event = require('../../src/Event');
+const Event = require('../../lib/Event');
 
 suite('Event', () => {
   /* eslint-disable no-new */
@@ -132,7 +131,7 @@ suite('Event', () => {
           causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1'
         }
       });
-    }).is.throwing('Type must be a string.');
+    }).is.throwing('Invalid type: integer should be string (at event.type).');
     done();
   });
 
@@ -153,7 +152,7 @@ suite('Event', () => {
           causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1'
         }
       });
-    }).is.throwing('Data must be an object.');
+    }).is.throwing('Invalid type: string should be object (at event.data).');
     done();
   });
 
@@ -211,95 +210,6 @@ suite('Event', () => {
     done();
   });
 
-  test('throws an error when authorization metadata is not an object.', done => {
-    assert.that(() => {
-      new Event({
-        context: {
-          name: 'foo'
-        },
-        aggregate: {
-          name: 'bar',
-          id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
-        },
-        name: 'foo',
-        metadata: {
-          correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          isAuthorized: 'bar'
-        }
-      });
-    }).is.throwing('Authorization must be an object.');
-    done();
-  });
-
-  test('throws an error when authorization metadata owner is missing.', done => {
-    assert.that(() => {
-      new Event({
-        context: {
-          name: 'foo'
-        },
-        aggregate: {
-          name: 'bar',
-          id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
-        },
-        name: 'foo',
-        metadata: {
-          correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          isAuthorized: {}
-        }
-      });
-    }).is.throwing('Owner is missing.');
-    done();
-  });
-
-  test('throws an error when authorization metadata authenticated is missing.', done => {
-    assert.that(() => {
-      new Event({
-        context: {
-          name: 'foo'
-        },
-        aggregate: {
-          name: 'bar',
-          id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
-        },
-        name: 'foo',
-        metadata: {
-          correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          isAuthorized: {
-            owner: uuid()
-          }
-        }
-      });
-    }).is.throwing('For authenticated is missing.');
-    done();
-  });
-
-  test('throws an error when authorization metadata public is missing.', done => {
-    assert.that(() => {
-      new Event({
-        context: {
-          name: 'foo'
-        },
-        aggregate: {
-          name: 'bar',
-          id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
-        },
-        name: 'foo',
-        metadata: {
-          correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          isAuthorized: {
-            owner: uuid(),
-            forAuthenticated: true
-          }
-        }
-      });
-    }).is.throwing('For public is missing.');
-    done();
-  });
-
   test('throws an error when custom is not an object.', done => {
     assert.that(() => {
       new Event({
@@ -320,7 +230,7 @@ suite('Event', () => {
           causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1'
         }
       });
-    }).is.throwing('Custom must be an object.');
+    }).is.throwing('Invalid type: string should be object (at event.custom).');
     done();
   });
 
@@ -352,7 +262,7 @@ suite('Event', () => {
     assert.that(actual.type).is.equalTo('domain');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
     assert.that(actual.custom).is.equalTo({});
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.published).is.false();
     assert.that(actual.metadata.correlationId).is.equalTo('5be0cef4-9051-44ca-a18c-a57c48d711c1');
@@ -391,7 +301,7 @@ suite('Event', () => {
     assert.that(actual.type).is.equalTo('domain');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
     assert.that(actual.custom).is.equalTo({ foo: 'custom-foobar' });
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.published).is.false();
     assert.that(actual.metadata.correlationId).is.equalTo('5be0cef4-9051-44ca-a18c-a57c48d711c1');
@@ -427,7 +337,7 @@ suite('Event', () => {
     assert.that(actual.id).is.ofType('string');
     assert.that(actual.type).is.equalTo('error');
     assert.that(actual.data).is.equalTo({ foo: 'foobarbaz' });
-    assert.that(actual.user).is.null();
+    assert.that(actual.initiator).is.null();
     assert.that(actual.metadata.timestamp).is.ofType('number');
     assert.that(actual.metadata.published).is.false();
     assert.that(actual.metadata.correlationId).is.equalTo('5be0cef4-9051-44ca-a18c-a57c48d711c1');
@@ -435,38 +345,7 @@ suite('Event', () => {
     done();
   });
 
-  test('returns an event with authorization metadata.', done => {
-    const ownerId = uuid();
-
-    const actual = new Event({
-      context: {
-        name: 'foo'
-      },
-      aggregate: {
-        name: 'bar',
-        id: uuid()
-      },
-      name: 'baz',
-      metadata: {
-        correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-        causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-        isAuthorized: {
-          owner: ownerId,
-          forPublic: true,
-          forAuthenticated: false
-        }
-      }
-    });
-
-    assert.that(actual.metadata.isAuthorized).is.equalTo({
-      owner: ownerId,
-      forPublic: true,
-      forAuthenticated: false
-    });
-    done();
-  });
-
-  suite('addUser', () => {
+  suite('addInitiator', () => {
     let event;
 
     setup(() => {
@@ -490,35 +369,35 @@ suite('Event', () => {
     });
 
     test('is a function.', done => {
-      assert.that(event.addUser).is.ofType('function');
+      assert.that(event.addInitiator).is.ofType('function');
       done();
     });
 
-    test('throws an error if user is missing.', done => {
+    test('throws an error if initiator is missing.', done => {
       assert.that(() => {
-        event.addUser();
-      }).is.throwing('User is missing.');
+        event.addInitiator();
+      }).is.throwing('Initiator is missing.');
       done();
     });
 
-    test('throws an error if user id is missing.', done => {
+    test('throws an error if initiator id is missing.', done => {
       assert.that(() => {
-        event.addUser({});
-      }).is.throwing('User id is missing.');
+        event.addInitiator({});
+      }).is.throwing('Initiator id is missing.');
       done();
     });
 
-    test('adds the user.', done => {
-      event.addUser({ id: 'Jane Doe' });
+    test('adds the initiator.', done => {
+      event.addInitiator({ id: 'Jane Doe' });
 
-      assert.that(event.user).is.equalTo({ id: 'Jane Doe' });
+      assert.that(event.initiator).is.equalTo({ id: 'Jane Doe' });
       done();
     });
   });
 
-  suite('wrap', () => {
+  suite('deserialize', () => {
     test('is a function.', done => {
-      assert.that(Event.wrap).is.ofType('function');
+      assert.that(Event.deserialize).is.ofType('function');
       done();
     });
 
@@ -543,7 +422,7 @@ suite('Event', () => {
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
       assert.that(actual).is.instanceOf(Event);
       done();
@@ -573,8 +452,8 @@ suite('Event', () => {
       deserializedEvent.metadata.timestamp = 'foo';
 
       assert.that(() => {
-        Event.wrap(deserializedEvent);
-      }).is.throwing('Event is malformed.');
+        Event.deserialize(deserializedEvent);
+      }).is.throwing('Invalid type: string should be number (at event.metadata.timestamp).');
       done();
     });
 
@@ -593,12 +472,7 @@ suite('Event', () => {
         },
         metadata: {
           correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          isAuthorized: {
-            owner: '91d27b69-a599-448b-80bd-87c5e93e4821',
-            forAuthenticated: true,
-            forPublic: false
-          }
+          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1'
         }
       });
 
@@ -607,7 +481,7 @@ suite('Event', () => {
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
       assert.that(actual.id).is.equalTo(event.id);
       assert.that(actual.metadata.correlationId).is.equalTo(event.metadata.correlationId);
@@ -615,9 +489,6 @@ suite('Event', () => {
       assert.that(actual.metadata.timestamp).is.equalTo(event.metadata.timestamp);
       assert.that(actual.metadata.hash).is.equalTo(event.metadata.hash);
       assert.that(actual.metadata.hashPredecessor).is.equalTo(event.metadata.hashPredecessor);
-      assert.that(actual.metadata.isAuthorized.owner).is.equalTo(event.metadata.isAuthorized.owner);
-      assert.that(actual.metadata.isAuthorized.forAuthenticated).is.equalTo(event.metadata.isAuthorized.forAuthenticated);
-      assert.that(actual.metadata.isAuthorized.forPublic).is.equalTo(event.metadata.isAuthorized.forPublic);
       done();
     });
 
@@ -645,13 +516,13 @@ suite('Event', () => {
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
       assert.that(actual.custom).is.equalTo(event.custom);
       done();
     });
 
-    test('keeps user data.', done => {
+    test('keeps initiator data.', done => {
       const event = new Event({
         context: {
           name: 'foo'
@@ -670,15 +541,15 @@ suite('Event', () => {
         }
       });
 
-      event.addUser({
+      event.addInitiator({
         id: 'Jane Doe'
       });
 
       const deserializedEvent = JSON.parse(JSON.stringify(event));
 
-      const actual = Event.wrap(deserializedEvent);
+      const actual = Event.deserialize(deserializedEvent);
 
-      assert.that(actual.user).is.equalTo(event.user);
+      assert.that(actual.initiator).is.equalTo(event.initiator);
       done();
     });
   });
@@ -1089,102 +960,6 @@ suite('Event', () => {
       done();
     });
 
-    test('returns false when no authorization owner is given.', done => {
-      assert.that(Event.isWellformed({
-        context: {
-          name: 'foo'
-        },
-        aggregate: {
-          name: 'bar',
-          id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
-        },
-        name: 'baz',
-        id: '37ab3da0-3d04-469b-827d-44230cec53e2',
-        type: 'foobar',
-        data: {
-          foo: 'foobarbaz'
-        },
-        metadata: {
-          correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          timestamp: Date.now(),
-          published: true,
-          isAuthorized: {
-            forAuthenticated: true,
-            forPublic: false
-          }
-        },
-        custom: {
-          foo: 'custom-foobar'
-        }
-      })).is.false();
-      done();
-    });
-
-    test('returns false when no authorization for authenticated is given.', done => {
-      assert.that(Event.isWellformed({
-        context: {
-          name: 'foo'
-        },
-        aggregate: {
-          name: 'bar',
-          id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
-        },
-        name: 'baz',
-        id: '37ab3da0-3d04-469b-827d-44230cec53e2',
-        type: 'foobar',
-        data: {
-          foo: 'foobarbaz'
-        },
-        metadata: {
-          correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          timestamp: Date.now(),
-          published: true,
-          isAuthorized: {
-            owner: uuid(),
-            forPublic: false
-          }
-        },
-        custom: {
-          foo: 'custom-foobar'
-        }
-      })).is.false();
-      done();
-    });
-
-    test('returns false when no authorization for public is given.', done => {
-      assert.that(Event.isWellformed({
-        context: {
-          name: 'foo'
-        },
-        aggregate: {
-          name: 'bar',
-          id: '85932442-bf87-472d-8b5a-b0eac3aa8be9'
-        },
-        name: 'baz',
-        id: '37ab3da0-3d04-469b-827d-44230cec53e2',
-        type: 'foobar',
-        data: {
-          foo: 'foobarbaz'
-        },
-        metadata: {
-          correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
-          timestamp: Date.now(),
-          published: true,
-          isAuthorized: {
-            owner: uuid(),
-            forAuthenticated: true
-          }
-        },
-        custom: {
-          foo: 'custom-foobar'
-        }
-      })).is.false();
-      done();
-    });
-
     test('returns true when the event is well-formed.', done => {
       assert.that(Event.isWellformed({
         context: {
@@ -1204,14 +979,9 @@ suite('Event', () => {
           correlationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
           causationId: '5be0cef4-9051-44ca-a18c-a57c48d711c1',
           timestamp: Date.now(),
-          published: true,
-          isAuthorized: {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: false
-          }
+          published: true
         },
-        user: {
+        initiator: {
           id: '3815e5b5-3d79-4875-bac2-7a1c9f88048b'
         },
         custom: {
