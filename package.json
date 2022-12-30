@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "assertthat": "2.0.3",
-    "roboter": "4.0.3"
+    "roboter": "13.2.1"
   },
   "repository": {
     "type": "git",
